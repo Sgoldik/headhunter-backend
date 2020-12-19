@@ -11,6 +11,7 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 import repo.*
 import rest.restUser
+import java.time.Duration
 
 fun main() {
     embeddedServer(Netty, port = 8080, module = Application::module).start()
@@ -20,8 +21,20 @@ fun Application.module() {
     install(ContentNegotiation) {
         json()
     }
-    install(DefaultHeaders)
-    // This uses use the logger to log every call (request/response)
+    install(CORS)
+    {
+        method(HttpMethod.Options)
+        method(HttpMethod.Get)
+        method(HttpMethod.Post)
+        method(HttpMethod.Put)
+        method(HttpMethod.Delete)
+        method(HttpMethod.Patch)
+        header(HttpHeaders.AccessControlAllowHeaders)
+        header(HttpHeaders.ContentType)
+        header(HttpHeaders.AccessControlAllowOrigin)
+        allowCredentials = true
+        anyHost()
+    }
     install(CallLogging)
     Database.connect(
         "jdbc:mysql://s29.webhost1.ru:3306/sgoldik_hunter?serverTimezone=Europe/Moscow",
@@ -34,14 +47,6 @@ fun Application.module() {
         SchemaUtils.create(resumesTable)
         SchemaUtils.create(repliesTable)
     }
-
-//    routing {
-//        route("/*") {
-//            get {
-//                call.respond("dsadasdas")
-//            }
-//        }
-//    }
 
     restUser<Item>(
         RepoDSL(usersTable),

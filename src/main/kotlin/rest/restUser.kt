@@ -23,11 +23,33 @@ fun <T : Item> Application.restUser(
             post {
                 call.respond(
                     parseBody(userSerializer)?.let { elem ->
-                        if (userRepo.add(elem))
-                            HttpStatusCode.OK
-                        else
-                            HttpStatusCode.NotFound
+                        if (userRepo.all().filter { it.username == elem.username }.isEmpty()) {
+                            if (userRepo.add(elem)) {
+                                call.respond(elem)
+                            } else {
+                                HttpStatusCode.NotFound
+                            }
+                        } else {
+                            HttpStatusCode.BadRequest
+                        }
                     } ?: HttpStatusCode.BadRequest
+                )
+            }
+        }
+        route("/user/login") {
+            post {
+                call.respond(
+                        parseBody(userSerializer)?.let { elem ->
+                            if (userRepo.all().filter { it.username == elem.username }.isNotEmpty()) {
+                                if (elem.password == userRepo.all().find { it.username == elem.username }!!.password) {
+                                    call.respond(elem)
+                                } else {
+                                    HttpStatusCode.BadRequest
+                                }
+                            } else {
+                                HttpStatusCode.NotFound
+                            }
+                        } ?: HttpStatusCode.BadRequest
                 )
             }
         }
