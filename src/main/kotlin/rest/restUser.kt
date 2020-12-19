@@ -95,6 +95,10 @@ fun <T : Item> Application.restUser(
                     } ?: HttpStatusCode.BadRequest
                 )
             }
+            get {
+                val resumes = resumeRepo.all()
+                call.respond(resumes)
+            }
         }
 
         route("/user/{id}/resumes") {
