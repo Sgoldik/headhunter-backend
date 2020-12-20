@@ -161,15 +161,10 @@ fun <T : Item> Application.restUser(
         }
         route("/user/{id}/resumes/replies") {
             get {
-                if (replyRepo.all().filter { it.userId == parseId() }.isNotEmpty()) {
                     val replies = resumeRepo.all().map { resume ->
                         replyRepo.all().filter { it.resumeId == resume.id && it.userId == parseId() }.isNotEmpty()
                     }
                     call.respond(replies)
-
-                } else {
-                    call.respond(HttpStatusCode.NotFound, "Отклики этого пользователя не найдены")
-                }
             }
         }
 
