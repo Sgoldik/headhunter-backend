@@ -202,6 +202,15 @@ fun <T : Item> Application.restUser(
                 )
             }
         }
+        route("/user/{id}/resumes/{resumeId}/reply") {
+            get {
+                parseId()?.let { id ->
+                    replyRepo.all().find { it.userId == id && it.resumeId == resumeId() }?.let { elem ->
+                        call.respond(elem)
+                    } ?: call.respond(HttpStatusCode.NotFound, "Отклик на резюме не найден")
+                } ?: call.respond(HttpStatusCode.BadRequest, "Передан неправильный ID")
+            }
+        }
         route("/user/resumes/reply/{id}") {
             get {
                 parseId()?.let { id ->
@@ -239,6 +248,9 @@ fun <T : Item> Application.restUser(
 
 fun PipelineContext<Unit, ApplicationCall>.parseId(id: String = "id") =
     call.parameters[id]?.toIntOrNull()
+
+fun PipelineContext<Unit, ApplicationCall>.resumeId(id: String = "resumeId") =
+        call.parameters[id]?.toIntOrNull()
 
 suspend fun <T> PipelineContext<Unit, ApplicationCall>.parseBody(
     serializer: KSerializer<T>
