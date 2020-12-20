@@ -14,7 +14,7 @@ import rest.restUser
 import java.time.Duration
 
 fun main() {
-    embeddedServer(Netty, port = 8080, module = Application::module).start()
+    embeddedServer(Netty, port = 3000, module = Application::module).start()
 }
 
 fun Application.module() {
