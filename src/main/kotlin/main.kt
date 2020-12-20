@@ -35,7 +35,7 @@ fun Application.module() {
         allowCredentials = true
         anyHost()
     }
-    install(CallLogging)
+//    install(CallLogging)
     Database.connect(
         "jdbc:mysql://s29.webhost1.ru:3306/sgoldik_hunter?serverTimezone=Europe/Moscow",
         driver = "com.mysql.jdbc.Driver",
