@@ -56,13 +56,6 @@ fun <T : Item> Application.restUser(
             }
         }
         route("/user/{id}") {
-            get {
-                parseId()?.let { id ->
-                    userRepo.get(id)?.let { elem ->
-                        call.respond(elem)
-                    } ?: call.respond(HttpStatusCode.NotFound, "Пользователь с таким ID не найден")
-                } ?: call.respond(HttpStatusCode.BadRequest, "Передан неправильный ID")
-            }
             put {
                 call.respond(
                     parseBody(userSerializer)?.let { elem ->
@@ -113,7 +106,7 @@ fun <T : Item> Application.restUser(
                     val userResumes = resumeRepo.all().filter { it.userId == parseId() }
                     call.respond(userResumes)
                 } else {
-                    call.respond(HttpStatusCode.NotFound, "У этого пользователя нет ни одного резюме")
+                    call.respond(listOf<Resume>())
                 }
             }
         }
@@ -157,6 +150,20 @@ fun <T : Item> Application.restUser(
                 } else {
                     call.respond(HttpStatusCode.NotFound, "Отклики для этого резюме не найдены")
                 }
+            }
+        }
+        route("/user/{id}/resumes/allReplies") {
+            get {
+                val userResumes = resumeRepo.all().filter { it.userId == parseId() }
+                val replies = arrayListOf<Reply>()
+                for (resume in userResumes) {
+                    val taskReplies = replyRepo.all().filter { it.resumeId == resume.id }
+                    for (reply in taskReplies) {
+                        replies.add(reply)
+                    }
+                }
+
+                call.respond(replies)
             }
         }
         route("/user/{id}/resumes/replies") {
