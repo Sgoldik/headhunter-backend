@@ -145,7 +145,7 @@ fun <T : Item> Application.restUser(
                             call.respond(HttpStatusCode.OK, "Резюме успешно удалено")
                         else
                             call.respond(HttpStatusCode.NotFound, "Резюме с таким ID не найдено")
-                    } ?: call.respond(HttpStatusCode.BadRequest, "Передан неправильный ID)
+                    } ?: call.respond(HttpStatusCode.BadRequest, "Передан неправильный ID")
                 )
             }
         }
@@ -156,6 +156,16 @@ fun <T : Item> Application.restUser(
                     call.respond(userReplies)
                 } else {
                     call.respond(HttpStatusCode.NotFound, "Отклики для этого резюме не найдены")
+                }
+            }
+        }
+        route("/user/resumes/replies") {
+            get {
+                if (replyRepo.all().isNotEmpty()) {
+                    val replies = replyRepo.all()
+                    call.respond(replies)
+                } else {
+                    call.respond(HttpStatusCode.NotFound, "Отклики не найдены")
                 }
             }
         }
